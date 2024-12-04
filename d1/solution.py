@@ -11,8 +11,9 @@ def solve():
     left.sort()
     right.sort()
 
-    return sum(abs(b - a) for a, b in zip(left, right))
+    print(sum(abs(b - a) for a, b in zip(left, right)))
+    print(sum(a * right.count(a) for a in left))
 
 
 if __name__ == "__main__":
-    print(f"{solve()}")
+    solve()
