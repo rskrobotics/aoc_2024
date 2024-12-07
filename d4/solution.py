@@ -54,6 +54,33 @@ def solve_pt1():
     total_sum = sum(checker(r, c) for r in range(ROWS) for c in range(COLS))
     print(f"SUM: {total_sum}")
 
+    def safe_get(x, y):
+        if 0 <= x < ROWS and 0 <= y < COLS:
+            return puzzle[x][y]
+        return None
+
+    # part2
+    def checker_2(r, c):
+        if puzzle[r][c] != "A":
+            return 0
+        LTRS = []
+        LTRS.append(safe_get(r - 1, c - 1))
+        LTRS.append(safe_get(r - 1, c + 1))
+        LTRS.append(safe_get(r + 1, c - 1))
+        LTRS.append(safe_get(r + 1, c + 1))
+
+        if (
+            (LTRS.count("M") == 2)
+            and (LTRS.count("S") == 2)
+            and (LTRS[0] != LTRS[3])
+            and (LTRS[1] != LTRS[2])
+        ):
+            return 1
+        return 0
+
+    total_sum2 = sum(checker_2(r, c) for r in range(ROWS) for c in range(COLS))
+    print(f"SUM_2: {total_sum2}")
+
 
 if __name__ == "__main__":
     solve_pt1()
