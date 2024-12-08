@@ -36,6 +36,30 @@ def get_antinode_coords(
     return antinodes
 
 
+def get_antinode_coords_with_resonance(
+    n1: tuple[int, int], n2: tuple[int, int], row_max: int, col_max: int
+) -> set(tuple[int, int]):
+    antinodes = set()
+    antinodes.add(n1)
+    vector = tuple(map(operator.sub, n1, n2))
+    node = n1
+    while True:
+        node = tuple(map(operator.add, node, vector))
+        if not is_within_bounds(row_max, col_max, node):
+            break
+        antinodes.add(node)
+    node = n1
+    while True:
+        node = tuple(map(operator.sub, node, vector))
+        if not is_within_bounds(row_max, col_max, node):
+            break
+        antinodes.add(node)
+
+    # print(f"NODES: {n1}, {n2}, ANTINODES: {antinodes}")
+
+    return antinodes
+
+
 def solve_pt1():
     data = parse_file()
     antennas = defaultdict(set)
@@ -52,7 +76,10 @@ def solve_pt1():
     for frequency, coords in antennas.items():
         pairs = list(combinations(coords, 2))
         antinodes[frequency] = set.union(
-            *[get_antinode_coords(*pair, len(data), len(data[0])) for pair in pairs]
+            *[
+                get_antinode_coords_with_resonance(*pair, len(data), len(data[0]))
+                for pair in pairs
+            ]
         )
 
     print(f"Solution: {len(set.union(*[v for v in antinodes.values()]))}")
