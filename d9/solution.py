@@ -4,6 +4,30 @@ def parse_input():
     return input
 
 
+def parse_sample_input():
+    with open("./puzzle_input.txt", "r") as f:
+        data = f.read().strip()
+
+        cells = []
+        datas = []
+        empty = []
+        pos = 0
+
+        for i, d in enumerate(data, 1):
+            cells += [
+                i // 2 + 1 if i % 2 else 0,
+            ] * int(d)
+
+            if i % 2:
+                datas.append([i // 2 + 1, int(d), pos])
+            else:
+                empty.append([0, int(d), pos])
+
+            pos += int(d)
+
+    return cells, datas, empty
+
+
 def unfurl_input(data):
     disk = []
     current_file_number = 0
@@ -30,48 +54,6 @@ def swapper(disk):
         r -= 1
 
 
-def find_empty_length(data):
-    seq = 0
-    for e in data:
-        if e == ".":
-            seq += 1
-        else:
-            break
-    return seq
-
-
-def swapper_2(disk):
-    l, r = 0, len(disk) - 1
-    while l < r:
-        while l < len(disk) and disk[l] != ".":
-            l += 1
-        if l >= len(disk):
-            break
-        space = find_empty_length(disk[l:])
-        while r >= 0 and disk[r] == ".":
-            r -= 1
-        if r < 0:
-            break
-        seq = 1
-        while r > 0 and disk[r - 1] == disk[r]:
-            seq += 1
-            r -= 1
-        if seq <= space:
-            print(f"SEQ: {seq} space: {space}")
-            print(f"SWAPPING: {l} {r}")
-
-            disk[l : l + seq], disk[r : r + seq] = disk[r : r + seq], disk[l : l + seq]
-            l += space
-
-            if l > r:
-                l, r = 0, len(disk) - 1
-        else:
-            print(f"Failed swap: {l}/{r}")
-            r -= 1
-        print(f"DISK: {disk}")
-    print(f"DONE! {disk}")
-
-
 def counter(disk):
     total = 0
     for i, v in enumerate(disk):
@@ -89,16 +71,38 @@ def solve():
     data = parse_input()
     disk = unfurl_input(data)
     # print(f"Disk: {disk}")
-    swapper_2(disk)
+    swapper(disk)
     counter(disk)
     # print(f"Disk: {disk}")
 
 
+def solve_p2(cells, datas, frees):
+    for data in reversed(datas):
+        for free_i in range(len(frees)):
+            # data doesn't have a free before it, break loop
+            if frees[free_i][2] > data[2]:
+                break
+
+            if frees[free_i][1] >= data[1]:
+                # set values in cell list
+                for i in range(data[1]):
+                    cells[frees[free_i][2] + i] = data[0]
+                    cells[data[2] + i] = 0
+
+                # update free size and position
+                frees[free_i][1] -= data[1]
+                frees[free_i][2] += data[1]
+
+                break
+
+    total = sum([max(v - 1, 0) * i for i, v in enumerate(cells)])
+    return total
+
+
 if __name__ == "__main__":
-    # print(f"parse_input{parse_input()}")
-    disk = "00...111...2...333.44.5555.6666.777.888899"
-    print(f"LEN DISK : {len(disk)}")
-    disk = list(disk)
-    print(f"DISK: {disk}")
-    print(swapper_2(disk))
-    # solve()
+    cells, data, empty = parse_sample_input()
+    print(f"Cells: {cells}")
+    # print(f"data: {data}")
+    # print(f"empty: {empty}")
+
+    print(f"{solve_p2(cells, data, empty)}")
