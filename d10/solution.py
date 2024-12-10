@@ -36,7 +36,7 @@ def traverse_down(data, coord, m, initiator):
     r, c = coord
     cval = int(data[r][c])
     if cval == 0:
-        m[coord].add(initiator)
+        m[coord] += 1
         print(f"Incrementing {coord}")
         return
     ngh = get_neighbours(data, coord)
@@ -52,7 +52,7 @@ def traverse_peaks(data, nines, m):
 
 
 def solve():
-    m = defaultdict(set)
+    m = defaultdict(int)
     # data = parse_sample_input()
     data = parse_input()
     zeros, nines = [], []
@@ -67,7 +67,7 @@ def solve():
     total = 0
     for k, v in m.items():
         print(f"k, v: {k}, {v}")
-        total += len(v)
+        total += v
     print(f"TOTAL: {total}")
 
     print(f"ZEROS: {zeros}")
