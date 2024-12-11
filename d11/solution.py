@@ -1,72 +1,48 @@
-class Node:
-    def __init__(self, val):
-        self.val = val
-        self.next = None
+from collections import defaultdict
 
 
 def parse_input():
-    dummy = Node(0)
-    curr = dummy
+    stones = defaultdict(lambda: 0)
     with open("./puzzle_input.txt", "r") as f:
         for line in f:
             for e in line.strip().split():
-                new = Node(e)
-                curr.next = new
-                curr = new
-
-    dbg = dummy.next
-    while dbg:
-        print(f"dbg.val: {dbg.val}")
-        dbg = dbg.next
-    return dummy
+                stones[e] += 1
+        for k, v in stones.items():
+            print(f"{k}, {v}")
+    return stones
 
 
 def parse_sample_input():
-    dummy = Node(0)
-    curr = dummy
+    stones = defaultdict(lambda: 0)
     with open("./sample_input.txt", "r") as f:
         for line in f:
             for e in line.strip().split():
-                new = Node(e)
-                curr.next = new
-                curr = new
-
-    dbg = dummy.next
-    while dbg:
-        print(f"dbg.val: {dbg.val}")
-        dbg = dbg.next
-    return dummy
+                stones[e] += 1
+        for k, v in stones.items():
+            print(f"{k}, {v}")
+    return stones
 
 
 def solve(blinks):
-    dummy = parse_input()
+    stones = parse_input()
     for i in range(blinks):
-        print("Blinking!")
-        head = dummy.next
-        # dbg = []
-        while head:
-            # dbg.append(head.val)
-            if int(head.val) == 0:
-                head.val = "1"
-                head = head.next
-            elif len(head.val) % 2 == 0:
-                tmp = head.next
-                new = Node(str(int(head.val[len(head.val) // 2 :])))
-                head.val = head.val[: len(head.val) // 2]
-                head.next = new
-                new.next = tmp
-                head = head.next.next
+        processed = defaultdict(int)
+        dbg = []
+        for k, v in stones.items():
+            dbg.append((k, v))
+            if k == "0":
+                processed["1"] += v
+            elif len(k) % 2 == 0:
+                mid = len(k) // 2
+                rpart = k[mid:].lstrip("0")
+                processed[rpart if rpart else "0"] += v
+                processed[k[:mid]] += v
             else:
-                head.val = str(int(head.val) * 2024)
-                head = head.next
-        # print(f"DBG: {dbg}")
+                processed[str(int(k) * 2024)] += v
+        stones = processed
+        print(f"DBG: {dbg}")
 
-    total = 0
-    head = dummy.next
-    while head:
-        total += 1
-        head = head.next
-
+    total = sum(processed.values())
     print(f"Total: {total}")
 
 
